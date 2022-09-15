@@ -3,6 +3,15 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/Hady Ahmed/Documents/GitHub/Location-Reminder/app/src/main/res/layout/activity_authentication.xml" value="0.33" />
+        <entry key="..\:/Users/Hady Ahmed/Documents/GitHub/Location-Reminder/app/src/main/res/layout/activity_reminder_description.xml" value="0.358695652173913" />
+        <entry key="..\:/Users/Hady Ahmed/Documents/GitHub/Location-Reminder/app/src/main/res/layout/activity_reminders.xml" value="0.33" />
+        <entry key="..\:/Users/Hady Ahmed/Documents/GitHub/Location-Reminder/app/src/main/res/layout/fragment_reminders.xml" value="0.358695652173913" />
+        <entry key="..\:/Users/Hady Ahmed/Documents/GitHub/Location-Reminder/app/src/main/res/layout/fragment_save_reminder.xml" value="0.25" />
+        <entry key="..\:/Users/Hady Ahmed/Documents/GitHub/Location-Reminder/app/src/main/res/layout/fragment_select_location.xml" value="0.358695652173913" />
+        <entry key="..\:/Users/Hady Ahmed/Documents/GitHub/Location-Reminder/app/src/main/res/layout/it_reminder.xml" value="0.358695652173913" />
+        <entry key="..\:/Users/Hady Ahmed/Documents/GitHub/Location-Reminder/app/src/main/res/menu/main_menu.xml" value="0.36666666666666664" />
+        <entry key="..\:/Users/Hady Ahmed/Documents/GitHub/Location-Reminder/app/src/main/res/menu/map_options.xml" value="0.36666666666666664" />
         <entry key="app/src/main/res/layout/activity_authentication.xml" value="0.20364583333333333" />
         <entry key="app/src/main/res/layout/activity_reminder_description.xml" value="0.15454545454545454" />
         <entry key="app/src/main/res/layout/activity_reminders.xml" value="0.15489130434782608" />

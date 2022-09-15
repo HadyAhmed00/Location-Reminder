@@ -22,8 +22,10 @@ import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.LocationSettingsRequest
 import com.google.android.material.snackbar.Snackbar
+import com.google.firebase.auth.FirebaseAuth
 import com.udacity.project4.BuildConfig
 import com.udacity.project4.R
+import com.udacity.project4.authentication.AuthenticationActivity
 import kotlinx.android.synthetic.main.activity_reminders.*
 import com.udacity.project4.base.BaseViewModel
 
@@ -56,6 +58,12 @@ class RemindersActivity : AppCompatActivity() {
             android.R.id.home -> {
                 (nav_host_fragment as NavHostFragment).navController.popBackStack()
                 return true
+            }
+            R.id.logout->{
+                FirebaseAuth.getInstance().signOut()
+                startActivity(Intent(this,AuthenticationActivity::class.java))
+                finish()
+
             }
         }
         return super.onOptionsItemSelected(item)

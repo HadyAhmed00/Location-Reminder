@@ -2,9 +2,11 @@ package com.udacity.project4.locationreminders.savereminder
 
 import android.app.Application
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.maps.model.PointOfInterest
 import com.udacity.project4.R
+import com.udacity.project4.authentication.FirebaseUserLiveData
 import com.udacity.project4.base.BaseViewModel
 import com.udacity.project4.base.NavigationCommand
 import com.udacity.project4.locationreminders.data.ReminderDataSource
@@ -20,6 +22,20 @@ class SaveReminderViewModel(val app: Application, val dataSource: ReminderDataSo
     val selectedPOI = MutableLiveData<PointOfInterest>()
     val latitude = MutableLiveData<Double>()
     val longitude = MutableLiveData<Double>()
+
+    enum class AuthenticationState {
+        AUTHENTICATED, UNAUTHENTICATED, INVALID_AUTHENTICATION
+    }
+
+    val userState = FirebaseUserLiveData().map{
+        if(it==null){
+            AuthenticationState.UNAUTHENTICATED
+        }else{
+            AuthenticationState.AUTHENTICATED
+        }
+
+    }
+
 
     /**
      * Clear the live data objects to start fresh next time the view model gets called
