@@ -2,10 +2,7 @@ package com.udacity.project4.locationreminders
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.TestCoroutineDispatcher
-import kotlinx.coroutines.test.TestCoroutineScope
-import kotlinx.coroutines.test.resetMain
-import kotlinx.coroutines.test.setMain
+import kotlinx.coroutines.test.*
 import org.junit.rules.TestWatcher
 import org.junit.runner.Description
 
@@ -22,5 +19,12 @@ class MainCoroutineRule(val dispatcher: TestCoroutineDispatcher = TestCoroutineD
         super.finished(description)
         cleanupTestCoroutines()
         Dispatchers.resetMain()
+    }
+
+    fun stop(){
+        this.pauseDispatcher()
+    }
+    fun reRun(){
+        this.resumeDispatcher()
     }
 }

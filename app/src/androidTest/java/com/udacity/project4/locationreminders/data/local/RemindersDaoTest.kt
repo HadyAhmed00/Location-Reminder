@@ -1,11 +1,13 @@
 package com.udacity.project4.locationreminders.data.local
 
+import androidx.appcompat.widget.ResourceManagerInternal
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
 import com.udacity.project4.locationreminders.data.dto.ReminderDTO
+import com.udacity.project4.locationreminders.reminderslist.ReminderDataItem
 
 import org.junit.Before
 import org.junit.Rule
@@ -42,30 +44,42 @@ class RemindersDaoTest {
     }
 
     @After
-    fun closeDb() = database.close()
+    fun closeDb()
+    {
+
+        database.close()
+    }
+
+    private fun creteReminder():ReminderDTO{
+        return ReminderDTO(title = "title",
+        description = "some randomTxt",
+        location = "loc",
+        latitude = 1.1,
+        longitude = 2.2,
+        id = "id1")
+
+    }
+
+    private fun chickReminder(rem1:ReminderDTO,rem2:ReminderDTO) :Boolean
+    {
+        return rem1==rem2
+    }
 
     @Test
-    fun insertReminderAndGetById() = runBlockingTest {
-        // GIVEN - insert a reminder
-        val reminder = ReminderDTO(
-            "title",
-            "description",
-            "somewhere",
-            12.0,
-            12.0,
-            "random"
-        )
-        database.reminderDao().saveReminder(reminder)
+    fun insertFunction_putValidDataIndDataset_retriveThesame() = runBlockingTest {
 
-        // WHEN - Get the reminder by id from the database
-        val loaded = database.reminderDao().getReminderById(reminder.id)
+        //GIVEN - a Valid Reminder
+        val testReminderItem = creteReminder()
 
-        // THEN - The loaded data contains the expected values
-        assertThat(loaded as ReminderDTO, notNullValue())
-        assertThat(loaded.id, `is`(reminder.id))
-        assertThat(loaded.title, `is`(reminder.title))
-        assertThat(loaded.description, `is`(reminder.description))
-        assertThat(loaded.latitude, `is`(reminder.latitude))
-        assertThat(loaded.longitude, `is`(reminder.longitude))
+        //WHEN - set or save the Reminder in the database and retrieve it
+        database.reminderDao().saveReminder(testReminderItem)
+
+        val result =
+            database.reminderDao().getReminderById("id1")
+                ?.let { chickReminder(testReminderItem, it) }
+        //THEN - 2 reminders are the same
+        assertThat(result,`is`(true))
+
+
     }
 }

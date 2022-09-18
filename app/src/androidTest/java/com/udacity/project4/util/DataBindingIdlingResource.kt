@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 package com.udacity.project4.util
-
 import android.view.View
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding

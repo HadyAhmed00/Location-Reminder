@@ -6,8 +6,7 @@ import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.IdlingRegistry
-import androidx.test.espresso.action.ViewActions.click
-import androidx.test.espresso.action.ViewActions.replaceText
+import androidx.test.espresso.action.ViewActions.*
 import androidx.test.espresso.assertion.ViewAssertions
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.RootMatchers.withDecorView
@@ -117,30 +116,18 @@ class RemindersActivityTest :
 
         val activityScenario = ActivityScenario.launch(RemindersActivity::class.java)
         dataBindingIdlingResource.monitorActivity(activityScenario)
-
         onView(withId(R.id.addReminderFAB)).perform(click())
-        onView(withId(R.id.reminderTitle)).perform(replaceText("Test Title"))
-        onView(withId(R.id.reminderDescription)).perform(replaceText("Test Description"))
-
-        Thread.sleep(1000)
-
+        onView(withId(R.id.reminderTitle)).perform(replaceText("Test "))
+        onView(withId(R.id.reminderDescription)).perform(replaceText("Test Test Test Test Test"))
         onView(withId(R.id.selectLocation)).perform(click())
-        onView(withId(R.id.map_fragment)).perform(click())
-
-        Thread.sleep(3000)
-
-        onView(withId(R.id.save_reminder_location_button)).perform(click())
+        onView(withId(R.id.map)).perform(longClick())
+        onView(withId(R.id.save_location_button)).perform(click())
         onView(withId(R.id.saveReminder)).perform(click())
-
-        onView(withText(R.string.reminder_saved)).inRoot(
-            withDecorView(
-                not(
-                    `is`(
-                        getActivity(activityScenario)!!.window.decorView
-                    )
-                )
-            )
+        onView(withText("Reminder Saved !")).inRoot(
+            withDecorView(not(`is`(getActivity(activityScenario)!!.window.decorView)))
         ).check(matches(isDisplayed()))
+
+
 
         activityScenario.close()
     }
@@ -158,22 +145,13 @@ class RemindersActivityTest :
 
         val activityScenario = ActivityScenario.launch(RemindersActivity::class.java)
         dataBindingIdlingResource.monitorActivity(activityScenario)
-
         onView(withId(R.id.addReminderFAB)).perform(click())
-        onView(withId(R.id.reminderDescription)).perform(replaceText("Test Description"))
-
-        Thread.sleep(1000)
-
+        onView(withId(R.id.reminderDescription)).perform(replaceText("Description"))
         onView(withId(R.id.selectLocation)).perform(click())
-        onView(withId(R.id.map_fragment)).perform(click())
-
-        Thread.sleep(3000)
-
-        onView(withId(R.id.save_reminder_location_button)).perform(click())
+        onView(withId(R.id.save_location_button)).perform(click())
         onView(withId(R.id.saveReminder)).perform(click())
-
         onView(withId(com.google.android.material.R.id.snackbar_text))
-            .check(ViewAssertions.matches(withText(R.string.save_reminder_error_explanation)))
+            .check(matches(withText("Please enter title")))
         activityScenario.close()
     }
 }

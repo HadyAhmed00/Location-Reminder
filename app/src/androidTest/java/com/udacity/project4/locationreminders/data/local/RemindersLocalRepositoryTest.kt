@@ -5,11 +5,10 @@ import androidx.test.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.udacity.project4.locationreminders.data.dto.ReminderDTO
-import com.udacity.project4.locationreminders.data.dto.Result
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import org.hamcrest.CoreMatchers.`is`
-import org.hamcrest.MatcherAssert.assertThat
+import org.hamcrest.MatcherAssert
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -25,6 +24,8 @@ class RemindersLocalRepositoryTest {
     private lateinit var remindersDatabase: RemindersDatabase
     private lateinit var remindersDAO: RemindersDao
     private lateinit var repository: RemindersLocalRepository
+
+    private val NUMBER_OF_TEST_REMINDERS =10
 
     @Before
     fun setup() {
@@ -42,49 +43,52 @@ class RemindersLocalRepositoryTest {
     }
 
     @After
-    fun closeDb() = remindersDatabase.close()
+    fun closeDb() {
+        remindersDatabase.close()
+    }
+
+
+
+    private fun creteReminder():MutableList<ReminderDTO>{
+
+        val list : MutableList<ReminderDTO> = ArrayList()
+        for(i in 0..NUMBER_OF_TEST_REMINDERS){
+            list.add(
+                ReminderDTO(title = "titleNo${i}",
+                    description = "some randomTxt of Reminder NO${i}",
+                    location = "loc of Reminder NO${i}",
+                    latitude = i.toDouble(),
+                    longitude = i.toDouble(),
+                    id = "id${i}")
+            )
+        }
+        return list
+
+    }
+
+    private fun chickReminder(rem1:ReminderDTO,rem2:ReminderDTO) :Boolean
+    {
+        return rem1==rem2
+    }
+
 
     @Test
-    fun insertThreeReminders_getAllThreeFromDatabase() = runBlocking {
-        // GIVEN - insert three reminders in the database
-        val reminder1 = ReminderDTO(
-            "title1",
-            "description1",
-            "somewhere1",
-            11.0,
-            11.0,
-            "random1"
-        )
-        val reminder2 = ReminderDTO(
-            "title2",
-            "descriptio2n",
-            "somewhere2",
-            12.0,
-            12.0,
-            "random2"
-        )
-        val reminder3 = ReminderDTO(
-            "title3",
-            "description3",
-            "somewhere3",
-            13.0,
-            13.0,
-            "random3"
-        )
-        remindersDatabase.reminderDao().saveReminder(reminder1)
-        remindersDatabase.reminderDao().saveReminder(reminder2)
-        remindersDatabase.reminderDao().saveReminder(reminder3)
-        val remindersList = listOf(reminder1, reminder2, reminder3).sortedBy { it.id }
+    fun InsertAllTest_putmoreThenOneRmider_chickAllThem() = runBlocking {
 
-        // WHEN - Get all the reminders from the database
-        val loadedRemindersList = remindersDatabase.reminderDao().getReminders()
-        val sortedLoadedRemindersList = loadedRemindersList.sortedBy { it.id }
-        val reminder = repository.getReminder("fake") as Result.Error
+        //GIVEN - NUMBER_OF_REMINDERS  of valid Reminders
+        val inputRemindersList = creteReminder()
 
-        // THEN - The loaded data contains the expected values
-        assertThat(reminder.message, `is`("Reminder not found!"))
-        assertThat(sortedLoadedRemindersList[0].id, `is`(remindersList[0].id))
-        assertThat(sortedLoadedRemindersList[1].id, `is`(remindersList[1].id))
-        assertThat(sortedLoadedRemindersList[2].id, `is`(remindersList[2].id))
+        for (reminderDTO in inputRemindersList) {
+            remindersDatabase.reminderDao().saveReminder(reminderDTO)
+        }
+
+        val retrievedRemindersList = remindersDAO.getReminders()
+
+        for (i in 0 until NUMBER_OF_TEST_REMINDERS)
+        {
+            val result = chickReminder(retrievedRemindersList[i],inputRemindersList[i])
+            MatcherAssert.assertThat(result,`is`(true))
+        }
+
     }
 }

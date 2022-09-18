@@ -5,8 +5,10 @@ import android.os.Build
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.google.firebase.FirebaseApp
 import com.udacity.project4.locationreminders.MainCoroutineRule
 import com.udacity.project4.locationreminders.data.FakeDataSource
+import com.udacity.project4.locationreminders.data.ReminderDataSource
 import com.udacity.project4.locationreminders.reminderslist.ReminderDataItem
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -17,61 +19,59 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
 import org.hamcrest.core.Is.`is`
+import org.koin.core.context.stopKoin
 
 @Config(sdk = [Build.VERSION_CODES.P])
 @ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
 class SaveReminderViewModelTest {
 
-
-    //COMPLETE: provide testing to the SaveReminderView and its live data objects
-
-    // Executes each task synchronously using Architecture Components.
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
 
-    // Set the main coroutines dispatcher for unit testing.
-    @get:Rule
-    var mainCoroutineRule = MainCoroutineRule()
-
-    // Subject under test
-    private lateinit var saveReminderViewModel: SaveReminderViewModel
-
-    // Use a fake repository to be injected into the view model.
-    private lateinit var remindersLocalRepository: FakeDataSource
+    lateinit var remindersLocalRepository: ReminderDataSource
+    lateinit var saveReminderViewModel: SaveReminderViewModel
 
     @Before
-    fun setupViewModel() {
-        // Initialise the repository with no reminders.
+    fun initTheRpoAndViewMode(){
+        stopKoin()
         remindersLocalRepository = FakeDataSource()
-        val appContext = ApplicationProvider.getApplicationContext() as Application
-        saveReminderViewModel = SaveReminderViewModel(appContext, remindersLocalRepository)
+
+        saveReminderViewModel= SaveReminderViewModel(
+            ApplicationProvider.getApplicationContext(),remindersLocalRepository
+        )
+    }
+
+    fun createReminder(isInvalid:Boolean): ReminderDataItem {
+
+        return if(isInvalid){
+            ReminderDataItem(null,"Desc","loc",1.2,1.3,"someid")
+
+        }else{
+            ReminderDataItem("title","Desc","loc",1.2,1.3,"someid")
+        }
+
+
+    }
+    @Test
+    fun validateReminder_InvalidReminder_False(){
+        // GIVEN - invalid reminder
+
+        val tmpReminder = createReminder(true)
+        // WHEN - chick the valid Reminder
+        val result = saveReminderViewModel.validateEnteredData(tmpReminder)
+        //That - Return true
+        assertThat(result, `is`(false))
     }
 
     @Test
-    fun whenIncompleteInfo_validationReturnsNull() {
-        // GIVEN - incomplete reminder fields, title is null
-        saveReminderViewModel.onClear()
-        saveReminderViewModel.reminderTitle.value = null
-        saveReminderViewModel.reminderDescription.value = "some description"
-        saveReminderViewModel.reminderSelectedLocationStr.value = null
-        saveReminderViewModel.longitude.value = 10.0
-        saveReminderViewModel.latitude.value = 10.0
+    fun validateReminder_ValidReminder_True(){
+        // GIVEN - valid reminder
+        val tmpReminder = createReminder(false)
+        // WHEN - chick the valid Reminder
+        val result = saveReminderViewModel.validateEnteredData(tmpReminder)
 
-        // WHEN - atempting to validate
-        val result = saveReminderViewModel.validateEnteredData(
-            ReminderDataItem(
-                saveReminderViewModel.reminderTitle.value,
-                saveReminderViewModel.reminderDescription.value,
-                saveReminderViewModel.reminderSelectedLocationStr.value,
-                saveReminderViewModel.longitude.value,
-                saveReminderViewModel.latitude.value,
-                "someId"
-            )
-        )
-
-        // THEN - result is false
-        assertThat(result, `is`(false))
-
+        //That - Return true
+        assertThat(result, `is`(true))
     }
 }

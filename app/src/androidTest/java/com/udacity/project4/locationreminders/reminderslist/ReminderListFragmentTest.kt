@@ -6,16 +6,13 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.fragment.app.testing.launchFragmentInContainer
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
-import androidx.recyclerview.widget.RecyclerView
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.matches
-import androidx.test.espresso.contrib.RecyclerViewActions
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
-import com.google.android.gms.tasks.Task
 import com.udacity.project4.R
 import com.udacity.project4.locationreminders.data.ReminderDataSource
 import com.udacity.project4.locationreminders.data.dto.ReminderDTO
@@ -96,6 +93,20 @@ class ReminderListFragmentTest : AutoCloseKoinTest() {
         }
     }
 
+    private fun creteReminder():ReminderDTO{
+        return ReminderDTO(title = "title",
+            description = "some randomTxt",
+            location = "loc",
+            latitude = 1.1,
+            longitude = 2.2,
+            id = "id1")
+
+    }
+
+    private fun chickReminder(rem1:ReminderDTO,rem2:ReminderDTO) :Boolean
+    {
+        return rem1==rem2
+    }
     @Test
     fun clickTask_navigateToSaveReminderFragment()  {
         // GIVEN - On the home screen
@@ -118,26 +129,19 @@ class ReminderListFragmentTest : AutoCloseKoinTest() {
     }
 
     @Test
-    fun reminderIsShownInRecyclerView() {
+    fun reminderIsShownInRecyclerView() = runBlockingTest {
         runBlocking {
             // GIVEN - one reminder
-            val reminder1 = ReminderDTO(
-                "title1",
-                "description1",
-                "somewhere1",
-                11.0,
-                11.0,
-                "random1"
-            )
-            remindersRepository.saveReminder(reminder1)
+            val testReminder = creteReminder()
+            remindersRepository.saveReminder(testReminder)
 
             // WHEN - ReminderListFragment is displayed
             launchFragmentInContainer<ReminderListFragment>(Bundle(), R.style.AppTheme)
 
             // THEN - the reminder is displayed
-            onView(withText(reminder1.title)).check(matches(isDisplayed()))
-            onView(withText(reminder1.description)).check(matches(isDisplayed()))
-            onView(withText(reminder1.location)).check(matches(isDisplayed()))
+            onView(withText(testReminder.title)).check(matches(isDisplayed()))
+            onView(withText(testReminder.description)).check(matches(isDisplayed()))
+            onView(withText(testReminder.location)).check(matches(isDisplayed()))
         }
     }
 }

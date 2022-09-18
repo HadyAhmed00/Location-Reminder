@@ -27,14 +27,7 @@ class SaveReminderViewModel(val app: Application, val dataSource: ReminderDataSo
         AUTHENTICATED, UNAUTHENTICATED, INVALID_AUTHENTICATION
     }
 
-    val userState = FirebaseUserLiveData().map{
-        if(it==null){
-            AuthenticationState.UNAUTHENTICATED
-        }else{
-            AuthenticationState.AUTHENTICATED
-        }
 
-    }
 
 
     /**

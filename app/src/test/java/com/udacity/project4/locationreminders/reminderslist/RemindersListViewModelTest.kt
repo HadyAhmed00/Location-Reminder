@@ -8,9 +8,13 @@ import com.udacity.project4.locationreminders.MainCoroutineRule
 import com.udacity.project4.locationreminders.data.FakeDataSource
 import com.udacity.project4.locationreminders.getOrAwaitValue
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.pauseDispatcher
 import kotlinx.coroutines.test.resumeDispatcher
+import kotlinx.coroutines.test.runBlockingTest
+import org.hamcrest.CoreMatchers
 import org.hamcrest.CoreMatchers.nullValue
+import org.hamcrest.MatcherAssert
 import org.hamcrest.core.Is.`is`
 import org.hamcrest.core.IsNot.not
 import org.junit.Assert.assertThat
@@ -26,26 +30,19 @@ import org.robolectric.annotation.Config
 @ExperimentalCoroutinesApi
 class RemindersListViewModelTest {
 
-    //Completed: provide testing to the RemindersListViewModel and its live data objects
 
-    // Executes each task synchronously using Architecture Components.
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
-
-    // Set the main coroutines dispatcher for unit testing.
     @get:Rule
     var mainCoroutineRule = MainCoroutineRule()
 
-    // Subject under test
     private lateinit var remindersListViewModel: RemindersListViewModel
-
-    // Use a fake repository to be injected into the view model.
     private lateinit var remindersRepository: FakeDataSource
 
     @Before
     fun setupViewModel() {
         stopKoin()
-        // Initialise the repository with no reminders.
+
         remindersRepository = FakeDataSource()
 
         remindersListViewModel = RemindersListViewModel(
@@ -54,29 +51,36 @@ class RemindersListViewModelTest {
     }
 
     @Test
-    fun loadReminders_loading() {
-        // GIVEN - we are loading reminders
-        mainCoroutineRule.pauseDispatcher()
+    fun loadReminders_loading() = runBlockingTest{
+        // GIVEN - We will load the reminders
+
+        mainCoroutineRule.stop() // pausing the dispatcher
         remindersListViewModel.loadReminders()
 
-        // WHEN - the dispatcher is paused, showLoading is true
-        assertThat(remindersListViewModel.showLoading.getOrAwaitValue(), `is`(true))
-        mainCoroutineRule.resumeDispatcher()
+        // WHEN - the working thread is Paused we should see the Loader
+        MatcherAssert.assertThat(
+            remindersListViewModel.showLoading.getOrAwaitValue(), CoreMatchers.`is`(true)
+        )
 
-        // THEN - when the dispatcher is resumed, showloading is false
-        assertThat(remindersListViewModel.showLoading.getOrAwaitValue(), `is`(false))
+        mainCoroutineRule.reRun() // streaming the dispatcher
+
+        // THEN - The Loader is gun
+        MatcherAssert.assertThat(
+            remindersListViewModel.showLoading.getOrAwaitValue(), CoreMatchers.`is`(false)
+        )
     }
 
     @Test
-    fun loadRemindersWhenUnavailable_causesError() {
-        // GIVEN - there's a problem loading reminders
-        // Make the repository return errors
-        remindersRepository.setReturnError(true)
+    fun loadRemindersWhenUnavailable_causesError()= runBlockingTest {
+        // GIVEN - load the data form the Repo and the data corrupted
+        remindersRepository.loadData=false
 
-        // WHEN - we want to load rhe reminders
+        // WHEN - loading the data
         remindersListViewModel.loadReminders()
 
-        // THEN - It's an error, there's a snackbar
-        assertThat(remindersListViewModel.showSnackBar.getOrAwaitValue(), not(nullValue()))
+        // THEN - the snack bar should be announced with an error massage
+        MatcherAssert.assertThat(
+            remindersListViewModel.showSnackBar.getOrAwaitValue(), CoreMatchers.`is`("The Data is not good!!")
+        )
     }
 }
