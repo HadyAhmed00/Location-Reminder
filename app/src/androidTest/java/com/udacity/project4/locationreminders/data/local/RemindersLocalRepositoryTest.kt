@@ -7,6 +7,7 @@ import androidx.test.filters.MediumTest
 import com.udacity.project4.locationreminders.data.dto.ReminderDTO
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
+import com.udacity.project4.locationreminders.data.dto.Result
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.MatcherAssert
 import org.junit.After
@@ -89,6 +90,22 @@ class RemindersLocalRepositoryTest {
             val result = chickReminder(retrievedRemindersList[i],inputRemindersList[i])
             MatcherAssert.assertThat(result,`is`(true))
         }
+
+    }
+
+    @Test
+    fun dataNotFound_passingInvalidID() = runBlocking {
+
+        //GIVEN - a Not exits Reminder
+        val testReminder = repository.getReminder("NotExistId")
+
+        //WHEN - we chick them
+        val error =  (testReminder is Result.Error)
+
+        //THEN - should return error
+        MatcherAssert.assertThat(error, `is`(true))
+
+
 
     }
 }

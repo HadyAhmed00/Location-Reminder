@@ -50,7 +50,7 @@ class RemindersActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
-        checkPermissionsAndStartGeofencing()
+//        checkPermissionsAndStartGeofencing()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -59,9 +59,9 @@ class RemindersActivity : AppCompatActivity() {
                 (nav_host_fragment as NavHostFragment).navController.popBackStack()
                 return true
             }
-            R.id.logout->{
+            R.id.logout -> {
                 FirebaseAuth.getInstance().signOut()
-                startActivity(Intent(this,AuthenticationActivity::class.java))
+                startActivity(Intent(this, AuthenticationActivity::class.java))
                 finish()
 
             }
@@ -70,8 +70,7 @@ class RemindersActivity : AppCompatActivity() {
     }
 
     ///
-
-    @RequiresApi(Build.VERSION_CODES.Q)
+   /* @RequiresApi(Build.VERSION_CODES.Q)
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<String>,
@@ -84,21 +83,9 @@ class RemindersActivity : AppCompatActivity() {
             grantResults[BACKGROUND_LOCATION_PERMISSION_INDEX] ==
             PackageManager.PERMISSION_DENIED
         ) {
-            ActivityCompat.requestPermissions(
-                this,
-                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-                0
-            )
-            ActivityCompat.requestPermissions(
-                this,
-                arrayOf(Manifest.permission.ACCESS_BACKGROUND_LOCATION),
-                0
-            )
-//            requestForegroundAndBackgroundLocationPermissions()
-
             Snackbar.make(
                 this.findViewById(R.id.nav_host_fragment),
-               "You need to grant location permission in order to play this game.",
+                "You need to grant location permission in order to play this game.",
                 Snackbar.LENGTH_INDEFINITE
             )
                 .setAction("settings") {
@@ -115,7 +102,6 @@ class RemindersActivity : AppCompatActivity() {
             checkDeviceLocationSettingsAndStartGeofence()
         }
     }
-
     private fun checkPermissionsAndStartGeofencing() {
 
         if (foregroundAndBackgroundLocationPermissionApproved()) {
@@ -124,9 +110,6 @@ class RemindersActivity : AppCompatActivity() {
             requestForegroundAndBackgroundLocationPermissions()
         }
     }
-
-     /**  Uses the Location Client to check the current state of location settings, and gives the user
-     *  the opportunity to turn on location services within our app.*/
     private fun checkDeviceLocationSettingsAndStartGeofence(resolve: Boolean = true) {
         val locationRequest = LocationRequest.create().apply {
             priority = LocationRequest.PRIORITY_LOW_POWER
@@ -158,21 +141,18 @@ class RemindersActivity : AppCompatActivity() {
         locationSettingsResponseTask.addOnCompleteListener {
             if (it.isSuccessful) {
 //                addGeofenceForClue()
-                Log.i(TAG,"Location is enabled successfully")
+                Log.i(TAG, "Location is enabled successfully")
             }
         }
     }
-
-
-     /**  Determines whether the app has the appropriate permissions across Android 10+ and all other
-     *  Android versions.*/
     @TargetApi(29)
     private fun foregroundAndBackgroundLocationPermissionApproved(): Boolean {
 
         val foregroundApproved = (
                 PackageManager.PERMISSION_GRANTED == ActivityCompat.checkSelfPermission(
                     this,
-                    Manifest.permission.ACCESS_FINE_LOCATION)
+                    Manifest.permission.ACCESS_FINE_LOCATION
+                )
                 )
 
 
@@ -187,8 +167,6 @@ class RemindersActivity : AppCompatActivity() {
 
         return backgroundApproved && foregroundApproved
     }
-
-     /**  Requests ACCESS_FINE_LOCATION and (on Android 10+ (Q) ACCESS_BACKGROUND_LOCATION.*/
     @TargetApi(29)
     private fun requestForegroundAndBackgroundLocationPermissions() {
 
@@ -211,13 +189,12 @@ class RemindersActivity : AppCompatActivity() {
         )
 
     }
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == REQUEST_TURN_DEVICE_LOCATION_ON) {
             checkDeviceLocationSettingsAndStartGeofence(false)
         }
-    }
+    }*/
 
 }
 

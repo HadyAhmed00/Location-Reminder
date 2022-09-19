@@ -80,7 +80,7 @@ class RemindersListViewModelTest {
 
         // THEN - the snack bar should be announced with an error massage
         MatcherAssert.assertThat(
-            remindersListViewModel.showSnackBar.getOrAwaitValue(), CoreMatchers.`is`("The Data is not good!!")
+            remindersListViewModel.showSnackBar.getOrAwaitValue(), CoreMatchers.`is`("Fail To Load Data")
         )
     }
 }

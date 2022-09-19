@@ -10,20 +10,25 @@ import kotlin.collections.HashMap
 class FakeDataSource : ReminderDataSource {
 
 
-//     Create a fake data source to act as a double to the real data source
-    var dataSource :HashMap<String,ReminderDTO> = HashMap()
+    //     Create a fake data source to act as a double to the real data source
+    var dataSource: HashMap<String, ReminderDTO> = HashMap()
 
-    var loadData : Boolean = true
+    var loadData: Boolean = true
     override suspend fun getReminders(): Result<List<ReminderDTO>> {
-        return if(!dataSource.isEmpty() && loadData) {
-            val tmpList : MutableList<ReminderDTO> = ArrayList()
-            dataSource.forEach{
-                tmpList.add(it.value)
+        return try {
+            if(loadData) {
+                val tmpList : MutableList<ReminderDTO> = ArrayList()
+                dataSource.forEach{
+                    tmpList.add(it.value)
+                }
+                Result.Success(tmpList)
+            }else{
+                throw Exception("Fail To Load Data")
             }
-            Result.Success(tmpList)
-        }else{
-            Result.Error("The Data is not good!!")
+        } catch (ex: Exception) {
+            Result.Error(ex.localizedMessage)
         }
+
     }
 
     override suspend fun saveReminder(reminder: ReminderDTO) {
@@ -31,15 +36,22 @@ class FakeDataSource : ReminderDataSource {
     }
 
     override suspend fun getReminder(id: String): Result<ReminderDTO> {
-        return if(!dataSource.isEmpty() && loadData) {
-            dataSource[id]?.let {
-                Result.Success(it)
-            }
-            return Result.Error("item not found")
+        return try {
+            if (loadData) {
+                dataSource[id]?.let {
+                    Result.Success(it)
+                }
+                return Result.Error("item not found")
 
-        }else{
-            Result.Error("The Data is not good!!")
+            } else {
+                throw Exception("Fail To Load Data")
+            }
         }
+        catch (ex:Exception)
+        {
+            Result.Error(ex.localizedMessage)
+        }
+
     }
 
     override suspend fun deleteAllReminders() {
