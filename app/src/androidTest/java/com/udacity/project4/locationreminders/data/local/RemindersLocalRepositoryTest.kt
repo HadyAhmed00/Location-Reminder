@@ -100,10 +100,11 @@ class RemindersLocalRepositoryTest {
         val testReminder = repository.getReminder("NotExistId")
 
         //WHEN - we chick them
-        val error =  (testReminder is Result.Error)
+        val error =  (testReminder) as Result.Error
+
 
         //THEN - should return error
-        MatcherAssert.assertThat(error, `is`(true))
+        MatcherAssert.assertThat(error.message, `is`("Reminder not found!"))
 
 
 

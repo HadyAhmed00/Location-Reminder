@@ -90,11 +90,7 @@ class SaveReminderFragment : BaseFragment() {
 
             reminderDataItem = ReminderDataItem(title, description, location, latitude, longitude)
             if (_viewModel.validateEnteredData(reminderDataItem)) {
-                if (foregroundAndBackgroundLocationPermissionApproved()) {
-                    checkDeviceLocationSettingsAndStartGeofence()
-                } else {
-                    requestForegroundAndBackgroundLocationPermissions()
-                }
+                checkPermissionsAndStartGeofencing()
             }
         }
     }
@@ -143,20 +139,7 @@ class SaveReminderFragment : BaseFragment() {
         }
     }
 
-    private fun makeSnackBarWithSettingAction() {
-        Snackbar.make(
-            requireView(),
-            "grant location permission in order to play this game.",
-            Snackbar.LENGTH_INDEFINITE
-        )
-            .setAction("settings") {
-                startActivity(Intent().apply {
-                    action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
-                    data = Uri.fromParts("package", BuildConfig.APPLICATION_ID, null)
-                    flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                })
-            }.show()
-    }
+
 
     @RequiresApi(Build.VERSION_CODES.Q)
     override fun onRequestPermissionsResult(
@@ -179,15 +162,6 @@ class SaveReminderFragment : BaseFragment() {
         }
     }
 
-    private fun checkPermissionsAndStartGeofencing() {
-
-        if (foregroundAndBackgroundLocationPermissionApproved()) {
-            checkDeviceLocationSettingsAndStartGeofence()
-        } else {
-            requestForegroundAndBackgroundLocationPermissions()
-        }
-    }
-
     private fun checkDeviceLocationSettingsAndStartGeofence(resolve: Boolean = true) {
         val locationRequest = LocationRequest.create().apply {
             priority = LocationRequest.PRIORITY_LOW_POWER
@@ -206,7 +180,8 @@ class SaveReminderFragment : BaseFragment() {
                     Log.d(TAG, "Error getting location settings resolution: " + sendEx.message)
                 }
             } else {
-                makeOkSnakBar()
+                makeOkSneakBar()
+                checkDeviceLocationSettingsAndStartGeofence()
             }
         }
 
@@ -218,6 +193,14 @@ class SaveReminderFragment : BaseFragment() {
         }
     }
 
+    private fun checkPermissionsAndStartGeofencing() {
+
+        if (foregroundAndBackgroundLocationPermissionApproved()) {
+            checkDeviceLocationSettingsAndStartGeofence()
+        } else {
+            requestForegroundAndBackgroundLocationPermissions()
+        }
+    }
     @TargetApi(29)
     private fun foregroundAndBackgroundLocationPermissionApproved(): Boolean {
 
@@ -270,13 +253,36 @@ class SaveReminderFragment : BaseFragment() {
         }
     }
 
-    private fun makeOkSnakBar() {
+    private fun makeOkSneakBar() {
         Snackbar.make(
             requireView(),
             "For A Better Experience you need to open location", Snackbar.LENGTH_INDEFINITE
         ).setAction(android.R.string.ok) {
             checkDeviceLocationSettingsAndStartGeofence()
         }.show()
+    }
+
+    private fun makeSnackBarWithSettingAction() {
+        Snackbar.make(
+            requireView(),
+            "grant location permission in order to play this game.",
+            Snackbar.LENGTH_INDEFINITE
+        )
+            .setAction("settings") {
+                startActivity(Intent().apply {
+                    action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
+                    data = Uri.fromParts("package", BuildConfig.APPLICATION_ID, null)
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                })
+            }.show()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if(this::geofencingClient.isInitialized && this::reminderDataItem.isInitialized) {
+            checkPermissionsAndStartGeofencing()
+
+        }
     }
 
 }
